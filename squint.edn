@@ -1,2 +1,2 @@
-{:paths ["src"]
+{:paths ["src/scenes"]
  :output-dir "src/gen"}

@@ -7,6 +7,10 @@
 (def GREEN "#99C47A")
 (def BLUE "#68ABDF")
 
+(def arr #js [1 2 3])
+(.push arr 4)
+arr
+
 (defn ^:gen main-scene [view]
   (-> view
       (.fontFamily "'JetBrains Mono', monospace")

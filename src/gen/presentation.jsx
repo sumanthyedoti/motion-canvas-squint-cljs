@@ -6,6 +6,9 @@ var YELLOW = "#FFC66D";
 var RED = "#FF6470";
 var GREEN = "#99C47A";
 var BLUE = "#68ABDF";
+var arr = [1, 2, 3];
+arr.push(4);
+arr;
 var main_scene = function* (view) {
 view.fontFamily("'JetBrains Mono', monospace").fontWeight(700).fontSize(256);
 const backdrop1 = createRef();
@@ -35,5 +38,5 @@ return (yield* beginSlide("finish"));
 };
 var default$ = makeScene2D(main_scene);
 
-export { YELLOW, RED, GREEN, BLUE, main_scene }
+export { YELLOW, RED, GREEN, BLUE, arr, main_scene }
 export default default$
