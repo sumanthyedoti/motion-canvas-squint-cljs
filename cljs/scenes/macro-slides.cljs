@@ -1,6 +1,7 @@
-(ns scenes.presentation
+(ns scenes.macro-slides
   (:require ["@motion-canvas/2d" :refer [Rect Txt makeScene2D]]
-            ["@motion-canvas/core" :as core :refer [Color all beginSlide cancel createRef createSignal easeInOutCubic]]))
+            ["@motion-canvas/core" :as core :refer [Color all beginSlide cancel createRef createSignal easeInOutCubic]])
+  (:require-macros [macros :refer [anim defscene, anim-all anim-seq ><<]]))
 
 (def YELLOW "#FFC66D")
 (def RED "#FF6470")
@@ -11,7 +12,7 @@
 (.push arr 4)
 arr
 
-(defn ^:gen main-scene [view]
+(defscene main-scene [view]
   (-> view
       (.fontFamily "'JetBrains Mono', monospace")
       (.fontWeight 700)
@@ -37,24 +38,22 @@ arr
                        :rotation #(* -1 (rotation) (rotationScale))}
                  "START"]])
 
-    (js-yield* (beginSlide "start"))
-    (js-yield*
-     (all
-      (.fill (backdrop) GREEN 0.6 easeInOutCubic (.createLerp Color "lab"))
-      (-> (backdrop) (.-size) (.x "60%" 0.6))
-      (.text (title) "CONTENT" 0.6)))
+    (anim (beginSlide "start"))
+    (anim-all
+     (.fill (backdrop) GREEN 0.6 easeInOutCubic (.createLerp Color "lab"))
+     (-> (backdrop) (.-size) (.x "60%" 0.6))
+     (.text (title) "CONTENT" 0.6))
 
-    (js-yield* (beginSlide "content"))
+    (anim (beginSlide "content"))
     (let [loopTask (js-yield (core/loop (js* "Infinity") (fn [] (-> (rotation -5 1) (.to 5 1)))))]
-      (js-yield*
-       (all
-        (.fill (backdrop) BLUE 0.6 easeInOutCubic (.createLerp Color "lab"))
-        (-> (backdrop) (.-size) (.x "70%" 0.6))
-        (.text (title) "ANIMATION" 0.6)
-        (rotationScale 1 0.6)))
+      (anim-all
+       (.fill (backdrop) BLUE 0.6 easeInOutCubic (.createLerp Color "lab"))
+       (-> (backdrop) (.-size) (.x "70%" 0.6))
+       (.text (title) "ANIMATION" 0.6)
+       (rotationScale 1 0.6))
 
-      (js-yield* (beginSlide "animation"))
-      (js-yield*
+      (anim (beginSlide "animation"))
+      (anim
        (all
         (.fill (backdrop) YELLOW 0.6 easeInOutCubic (.createLerp Color "lab"))
         (-> (backdrop) (.-size) (.x "50%" 0.6))
@@ -62,6 +61,4 @@ arr
         (rotationScale 0 0.6)))
       (cancel loopTask)
 
-      (js-yield* (beginSlide "finish")))))
-
-(def default (makeScene2D main-scene))
+      (anim (beginSlide "finish")))))

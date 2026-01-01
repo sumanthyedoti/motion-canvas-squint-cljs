@@ -1,2 +1,2 @@
-{:paths ["cljs/scenes"]
- :output-dir "src/scenes"}
+{:paths ["cljs"]
+ :output-dir "src"}

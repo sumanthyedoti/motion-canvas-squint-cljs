@@ -1,4 +1,4 @@
-(ns test
+(ns scenes.test
   (:require ["@motion-canvas/2d" :refer [Circle makeScene2D]]
             ["@motion-canvas/core" :refer [createRef]]))
 

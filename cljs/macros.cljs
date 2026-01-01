@@ -1,11 +1,5 @@
 (ns macros
-  "Essential macros for Motion Canvas in Squint
-   
-   These macros reduce boilerplate and make animations more declarative.")
-
-;; ============================================================================
-;; The Most Powerful Macro: anim
-;; ============================================================================
+  "Essential macros for Motion Canvas in Squint")
 
 (defmacro anim
   "Automatically wrap animation expressions in js-yield*.
@@ -22,13 +16,9 @@
    - all, sequence, chain
    - Custom tweens
    
-   This is the MOST USED macro - it eliminates 90% of js-yield* boilerplate!"
+   "
   [& body]
-  `(js-yield* ~@body))
-
-;; ============================================================================
-;; Scene Definition Macro
-;; ============================================================================
+  `(~'js-yield* ~@body))
 
 (defmacro defscene
   "Define a Motion Canvas scene with less boilerplate.
@@ -48,43 +38,9 @@
    - Exports as default"
   [name args & body]
   `(do
-     (defn ~(with-meta name {:async true :gen true}) ~args
+     (defn ~(with-meta name {:gen true}) ~args
        ~@body)
-     (def ~'default (makeScene2D ~name))))
-
-;; ============================================================================
-;; Node Threading Macro
-;; ============================================================================
-
-(defmacro with-node
-  "Thread a node reference through multiple operations.
-   
-   Instead of:
-     (let [n (circle)]
-       (-> n (.scale 2 1))
-       (-> n (.opacity 0 0.5)))
-   
-   Write:
-     (with-node (circle)
-       (.scale 2 1)
-       (.opacity 0 0.5))
-   
-   Each expression receives the node as first argument."
-  [node-expr & operations]
-  (let [node-sym (gensym "node")]
-    `(let [~node-sym ~node-expr]
-       ~@(map (fn [op]
-                (if (and (list? op) (symbol? (first op)))
-                  ;; Method call: (.method args)
-                  `(~(first op) ~node-sym ~@(rest op))
-                  ;; Expression: evaluate as-is
-                  op))
-              operations)
-       ~node-sym)))
-
-;; ============================================================================
-;; Animation Sequence Macro
-;; ============================================================================
+     (def ~'default (~'makeScene2D ~name))))
 
 (defmacro anim-seq
   "Create a sequence of animations that automatically yield.
@@ -103,11 +59,7 @@
    Each expression is automatically yielded in sequence."
   [& animations]
   `(do
-     ~@(map (fn [anim] `(js-yield* ~anim)) animations)))
-
-;; ============================================================================
-;; Parallel Animation Macro
-;; ============================================================================
+     ~@(map (fn [anim] `(~'js-yield* ~anim)) animations)))
 
 (defmacro anim-all
   "Run multiple animations in parallel with automatic yielding.
@@ -125,62 +77,35 @@
    
    Automatically wraps in js-yield* and all."
   [& animations]
-  `(js-yield*
-    (all ~@animations)))
+  `(~'js-yield*
+    (~'all ~@animations)))
 
-;; ============================================================================
-;; Tween Helper Macro
-;; ============================================================================
+(defmacro ><<
+  "Automatically save node state, run animations, & restore.
 
-(defmacro deftween
-  "Define a reusable tween animation.
-   
-   Instead of:
-     (defn my-tween [node]
-       (tween 2
-         (fn [value]
-           (-> node .-position (.x (map -300 300 value))))))
-   
-   Write:
-     (deftween my-tween [node]
-       [value]
-       (-> node .-position (.x (map -300 300 value))))
-   
-   The [value] parameter is the tween interpolation value (0-1)."
-  [name node-params value-params & body]
-  `(defn ~name ~node-params
-     (tween 2
-            (fn ~value-params
-              ~@body))))
+  Use When: Any time you want to animate away from initial state then return
 
-;; ============================================================================
-;; Usage Examples (in comments)
-;; ============================================================================
+  Without macro:
+  (let [node (circle)]
+    (.save node)
+    (anim-all (-> node (.position.x 300 1))
+              (-> node (.scale 2 1)))
+    (anim (.restore node 1)))
 
-(comment
-  ;; Example 1: Basic anim usage
-  (anim (-> (circle) (.scale 2 1)))
+  With macro:
+  (anim-and-restore (circle) 1
+                    (anim-all
+                      (.position.x 300 1)
+                      (.scale 2 1)))
 
-  ;; Example 2: defscene
-  (defscene my-animation [view]
-    (.add view #jsx [Circle {:ref circle}])
-    (anim (-> (circle) (.scale 2 1))))
-
-  ;; Example 3: with-node
-  (anim
-   (with-node (circle)
-     (.scale 2 1)
-     (.opacity 0 0.5)
-     (.rotation 360 1)))
-
-  ;; Example 4: anim-seq
-  (anim-seq
-   (-> (circle) (.scale 2 1))
-   (-> (circle) (.opacity 0 1))
-   (-> (circle) (.scale 1 1)))
-
-  ;; Example 5: anim-all
-  (anim-all
-   (-> circle1 (.scale 2 1))
-   (-> circle2 (.opacity 0 1))
-   (-> circle3 (.rotation 360 1))))
+  The restore happens automatically!"
+  [node-expr duration & body]
+  (let [node-sym (gensym "node")]  ; ← Unique symbol
+    `(let [~node-sym ~node-expr]
+       (.save ~node-sym)
+       ~@(map (fn [anim-form]
+                (let [[anim-type & ops] anim-form]
+                  `(~anim-type
+                    ~@(map (fn [op] `(-> ~node-sym ~op)) ops))))
+              body)
+       (~'anim (.restore ~node-sym ~duration)))))
