@@ -1,6 +1,22 @@
 (ns macros
   "Essential macros for Motion Canvas in Squint")
 
+(defmacro add-node
+  "Add a node to view with automatic JSX handling.
+   
+   Single node:
+     (add-node [Circle {:size 320 :fill 'lightseagreen'}])
+   
+   Nested nodes (children as vectors):
+     (add-node Rect {:width '50%' :height '50%'}
+       [Txt {:scale 0.5} 'START']
+       [Circle {:size 50}])
+   
+   Expands to:
+     (.add view #jsx [Rect {...} [Txt {...} 'START'] [Circle {...}]])"
+  [node-and-props]
+  `(.add view (jsx ~@node-and-props)))
+
 (defmacro anim
   "Automatically wrap animation expressions in js-yield*.
    

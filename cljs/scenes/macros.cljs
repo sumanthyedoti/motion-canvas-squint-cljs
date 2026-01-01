@@ -1,17 +1,15 @@
 (ns scenes.macros
   (:require ["@motion-canvas/2d" :refer [Circle Rect makeScene2D]]
             ["@motion-canvas/core" :refer [createRef all]])
-  (:require-macros [macros :refer [anim defscene anim-all anim-seq ><<]]))
+  (:require-macros [macros :refer [anim add-node defscene anim-all anim-seq ><<]]))
 
 (defscene macro-scene [view]
   (let [circle (createRef)
         rect (createRef)]
-    (.add view
-          #jsx [Circle {:ref circle
-                        :size 320
-                        :fill "lightseagreen"}])
-    (.add view
-          #jsx [Rect {:ref rect
+    (add-node [Circle {:ref circle
+                       :size 320
+                       :fill "lightseagreen"}])
+    (add-node  [Rect {:ref rect
                       :width 200
                       :height 100
                       :radius 20
