@@ -10,11 +10,11 @@ var arr = [1, 2, 3];
 arr.push(4);
 arr;
 var main_scene = function* (view) {
-view.fontFamily("'JetBrains Mono', monospace").fontWeight(700).fontSize(256);
 const backdrop1 = createRef();
 const title2 = createRef();
 const rotation3 = createSignal(0);
 const rotationScale4 = createSignal(0);
+view.fontFamily("'JetBrains Mono', monospace").fontWeight(700).fontSize(256);
 view.add(<Rect cache={true} ref={backdrop1} width="50%" height="50%" fill={RED} radius={40} smoothCorners={true} rotation={(function () {
 return (rotation3() * rotationScale4());
 

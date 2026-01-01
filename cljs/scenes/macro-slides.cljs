@@ -1,7 +1,7 @@
 (ns scenes.macro-slides
   (:require ["@motion-canvas/2d" :refer [Rect Txt makeScene2D]]
             ["@motion-canvas/core" :as core :refer [Color all beginSlide cancel createRef createSignal easeInOutCubic]])
-  (:require-macros [macros :refer [add-node anim defscene, anim-all anim-seq ><<]]))
+  (:require-macros [macros :refer [anim defscene, anim-all anim-seq ><<]]))
 
 (def YELLOW "#FFC66D")
 (def RED "#FF6470")
@@ -13,7 +13,6 @@
 arr
 
 (defscene main-scene [view]
-
   (let [backdrop (createRef)
         title (createRef)
         rotation (createSignal 0)
@@ -24,19 +23,19 @@ arr
         (.fontWeight 700)
         (.fontSize 256))
 
-    (add-node [:Rect {:cache true
-                      :ref backdrop
-                      :width "50%"
-                      :height "50%"
-                      :fill RED
-                      :radius 40
-                      :smoothCorners true
-                      :rotation #(* (rotation) (rotationScale))}
-               [:Txt {:ref title
-                      :scale 0.5
-                      :compositeOperation "destination-out"
-                      :rotation #(* -1 (rotation) (rotationScale))}
-                "START"]])
+    (.add view #jsx [:Rect {:cache true
+                            :ref backdrop
+                            :width "50%"
+                            :height "50%"
+                            :fill RED
+                            :radius 40
+                            :smoothCorners true
+                            :rotation #(* (rotation) (rotationScale))}
+                     [:Txt {:ref title
+                            :scale 0.5
+                            :compositeOperation "destination-out"
+                            :rotation #(* -1 (rotation) (rotationScale))}
+                      "START"]])
 
     (anim (beginSlide "start"))
     (anim-all

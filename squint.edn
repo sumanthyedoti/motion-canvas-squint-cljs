@@ -1,2 +1,4 @@
 {:paths ["cljs"]
- :output-dir "src"}
+ :output-dir "src"
+; :extension ".jsx"
+ }
