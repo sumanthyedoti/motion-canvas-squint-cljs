@@ -13,15 +13,16 @@
 arr
 
 (defscene main-scene [view]
-  (-> view
-      (.fontFamily "'JetBrains Mono', monospace")
-      (.fontWeight 700)
-      (.fontSize 256))
 
   (let [backdrop (createRef)
         title (createRef)
         rotation (createSignal 0)
         rotationScale (createSignal 0)]
+
+    (-> view
+        (.fontFamily "'JetBrains Mono', monospace")
+        (.fontWeight 700)
+        (.fontSize 256))
 
     (add-node [:Rect {:cache true
                       :ref backdrop
