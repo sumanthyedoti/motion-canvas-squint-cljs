@@ -212,3 +212,19 @@
            (.map ~nodes
                  (fn [~'it]
                    ~@body)))))
+
+(defmacro spawn-anims
+  "Start all animations immediately without waiting, then wait for total duration.
+   The variable 'it' is available in the animation body.
+
+   you have to figure out how long it would take for the generator in the loop to complete, 
+   but is useful in some situations.
+   
+   Usage:
+   (spawn-animations rects 4
+     (-> it .-position (.y 100 1) (.to -100 2) (.to 0 1)))"
+  [nodes total-duration & body]
+  `(do
+     (doseq [~'it ~nodes]
+       (js* "yield ~{}" ~@body))
+     (~'js-yield* (~'waitFor ~total-duration))))

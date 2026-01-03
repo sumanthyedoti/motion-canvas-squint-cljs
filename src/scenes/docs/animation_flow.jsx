@@ -51,14 +51,16 @@ return <Rect ref={m.makeRef(rects9, i)} width={100} height={100} x={(-250 + (125
 return m.all(rect.rotation(100, 1).to(-100, 1), rect.position.y(100, 1).to(-100, 2).to(0, 1));
 
 }))));
-(yield* squint_core.apply(m.all, rects9.map((function (it) {
+(yield* squint_core.apply(m.all, rects9.map((function (node) {
 return m.all(it.rotation(100, 1).to(-100, 1), it.position.y(100, 1).to(-100, 2).to(0, 1));
 
 }))));
-return (yield* squint_core.apply(m.all, rects9.map((function (it) {
-return m.all(it.rotation(100, 1).to(-100, 1), it.position.y(100, 1).to(-100, 2).to(0, 1));
-
-}))));
+for (let G__10 of squint_core.iterable(rects9)) {
+const rect11 = G__10;
+yield rect11.position.y(100, 1).to(-100, 2).to(0, 1)
+};
+(yield* m.waitFor(4));
+return spawn_anims(rects9, 4, it.position.y(100, 1).to(-100, 2).to(0, 1));
 
 };
 var default$ = makeScene2D(animation_flow);

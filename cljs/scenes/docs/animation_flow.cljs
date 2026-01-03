@@ -3,7 +3,7 @@
   (:require ["@motion-canvas/2d" :refer [Circle Rect makeScene2D]]
             ["@motion-canvas/core" :as m :refer [createRef all any chain sequence loop waitFor makeRef]])
   (:require-macros [macros :refer [anim defscene anim-all anim-any anim-chain anim-seq anim-delay ><<
-                                   wait-for add-node add-n-nodes anim-all-nodes]]))
+                                   wait-for add-node add-n-nodes anim-all-nodes spawn-anims]]))
 
 (defn ^:gen flicker [circle]
   (-> (circle) (.fill "red"))
@@ -113,9 +113,13 @@
                            (-> it (.rotation 100 1) (.to -100 1))
                            (-> it (.position.y 100 1) (.to -100 2) (.to 0 1))))
 
-    (anim-all-nodes rects (m/all
-                           (-> it (.rotation 100 1) (.to -100 1))
-                           (-> it (.position.y 100 1) (.to -100 2) (.to 0 1))))))
+    (doseq [rect rects]
+      (js* "yield ~{}" (-> rect .-position (.y 100 1) (.to -100 2) (.to 0 1))))
+    ;; Wait for animations to complete
+    (js-yield* (m/waitFor 4))
+
+    (spawn-anims rects 4
+                 (-> it .-position (.y 100 1) (.to -100 2) (.to 0 1)))))
 
 
 
