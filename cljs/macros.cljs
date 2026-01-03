@@ -194,7 +194,9 @@
 
 (defmacro anim-all-nodes
   "Animate all nodes in a collection in parallel.
-   The variable 'node' is available in the animation body.
+   The variable 'it' is available in the animation body.
+
+   - automatic duration
 
    Before:
    (js-yield*
@@ -205,13 +207,15 @@
       
    Usage:
    (anim-all-nodes rects
-     (-> node .-position (.y 100 1) (.to -100 2) (.to 0 1)))"
+     (-> it .-position (.y 100 1) (.to -100 2) (.to 0 1)))"
   [nodes & body]
-  `(~'js-yield*
-    (apply m/all
-           (.map ~nodes
-                 (fn [~'it]
-                   ~@body)))))
+  (let [node-sym (gensym "node")]
+    `(~'js-yield*
+      (apply ~'m/all
+             (.map ~nodes
+                   (fn [~node-sym]
+                     (let [~'it ~node-sym]
+                       ~@body)))))))
 
 (defmacro spawn-anims
   "Start all animations immediately without waiting, then wait for total duration.
@@ -219,12 +223,92 @@
 
    you have to figure out how long it would take for the generator in the loop to complete, 
    but is useful in some situations.
+
+   - More control over timing
+
    
    Usage:
    (spawn-animations rects 4
      (-> it .-position (.y 100 1) (.to -100 2) (.to 0 1)))"
-  [nodes total-duration & body]
+  ([nodes total-duration & body]
+   `(do
+      (doseq [~'it ~nodes]
+        (js* "yield ~{}" ~@body))
+      (~'js-yield* (~'waitFor ~total-duration)))))
+
+(defmacro spawn-stagger-anims
+  "Spawn animations with delay between each, then wait for total duration.
+  
+  - Can add delays between spawns if needed and wait for specified total duration
+   
+   Usage:
+   (stagger-spawn rects 0.1 4
+     (-> node .-position (.y 100 1) (.to -100 2) (.to 0 1)))"
+  [nodes stagger-delay total-duration & body]
   `(do
      (doseq [~'it ~nodes]
-       (js* "yield ~{}" ~@body))
-     (~'js-yield* (~'waitFor ~total-duration))))
+       (js* "yield ~{}" ~@body)
+       (~'js-yield* (~'m/waitFor ~stagger-delay)))
+     (~'js-yield* (~'m/waitFor ~total-duration))))
+
+;; --------------------
+;; ---- DOM Macros ----
+;; --------------------
+
+(defmacro find-all
+  "Find all nodes matching predicate. Variable 'node' available in predicate.
+   
+   Usage:
+   (find-all (d/is Txt))
+   (find-all (instance? Txt node))
+   (let [texts (find-all (> (-> node (.scale.x)) 1))]
+     ...)
+   "
+
+  [& predicate-body]
+  `(~'.findAll ~'view
+               (fn [~'node]
+                 ~@predicate-body)))
+
+(defmacro find-first
+  "Find all nodes matching predicate. Variable 'node' available in predicate.
+   
+   Usage:
+   (find-first (d/is Txt))
+   (find-first (instance? Txt node))
+   (let [texts (find-first (> (-> node (.scale.x)) 1))]
+     ...)
+   "
+  [& predicate-body]
+  `(~'.findFirst ~'view
+                 (fn [~'node]
+                   ~@predicate-body)))
+
+(defmacro find-last
+  "Find all nodes matching predicate. Variable 'node' available in predicate.
+   
+   Usage:
+   (find-last (d/is Txt))
+   (find-last (instance? Txt node))
+   (let [texts (find-last (> (-> node (.scale.x)) 1))]
+     ...)
+   "
+  [& predicate-body]
+  `(~'.findLast ~'view
+                (fn [~'node]
+                  ~@predicate-body)))
+
+(defmacro find-ancestor
+  "Find the closest ancestor of this node that matches the given predicate.
+   Variable 'node' available in predicate.
+   
+   Usage:
+   (find-last (d/is Txt))
+   (find-last (instance? Txt node))
+   (let [texts (find-last (> (-> node (.scale.x)) 1))]
+     ...)
+   "
+  [& predicate-body]
+  `(~'.findAncestor ~'view
+                    (fn [~'node]
+                      ~@predicate-body)))
