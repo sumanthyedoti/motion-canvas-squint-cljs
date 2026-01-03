@@ -1,7 +1,7 @@
 (ns scenes.macros
   (:require ["@motion-canvas/2d" :refer [Circle Rect makeScene2D]]
-            ["@motion-canvas/core" :refer [createRef all]])
-  (:require-macros [macros :refer [anim defscene anim-all anim-seq ><<]]))
+            ["@motion-canvas/core" :refer [createRef all chain]])
+  (:require-macros [macros :refer [anim defscene anim-all anim-chain wait-for play-and-restore]]))
 
 (defscene macro-scene [view]
   (let [circle (createRef)
@@ -26,16 +26,18 @@
                 (-> node (.scale 2 1)))
       (anim (.restore node 1)))
 
-    (><< (rect) 1
-         (anim-all
-          (.rotation 45 1)
-          (.opacity 0.5 1)))
+    (play-and-restore (rect) 1
+                      (anim-all
+                       (-> it (.rotation 45 1))
+                       (-> it (.opacity 0.5 1))))
+    (play-and-restore (rect) 1
+                      (anim (-> it (.rotation 45 1))))
 
     (anim-all
      (-> (circle) (.scale 2 1))
      (-> (rect) (.opacity 1 1))
      (-> (rect) (.rotation 360 1)))
-    (anim-seq
+    (anim-chain
      (-> (circle) (.opacity 1 1))
      (-> (circle) (.scale 1 1)))))
 

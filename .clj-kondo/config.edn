@@ -1,1 +1,1 @@
-{:linters {:unresolved-symbol {:exclude [js-yield* js-yield js*]}}}
+{:linters {:unresolved-symbol {:exclude [js-yield* js-yield js* it]}}}
