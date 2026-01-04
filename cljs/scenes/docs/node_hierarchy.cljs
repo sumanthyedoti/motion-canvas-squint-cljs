@@ -1,4 +1,4 @@
-(ns scenes.docs.animation_flow
+(ns scenes.docs.node_hierarchy
   (:refer-clojure :exclude [delay])
   (:require ["@motion-canvas/2d" :as d :refer [Circle Rect makeScene2D Layout Txt]]
             ["@motion-canvas/core" :as m :refer [createRef all any chain sequence loop waitFor makeRef]])
@@ -16,7 +16,8 @@
                   [Rect {:fill "#f3303f"
                          :padding 20
                          :gap 20}
-                   [Txt {:fill "#fff"}
+                   [Txt {:scale 1.15
+                         :fill "#fff"}
                     "42"]
                    [Circle {:size 60
                             :fill "#FFC66D"}]

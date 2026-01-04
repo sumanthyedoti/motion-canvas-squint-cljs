@@ -4,7 +4,8 @@ import { createRef } from '@motion-canvas/core';
 var example_scene = function* (view) {
 const circle1 = createRef();
 view.add(<Circle ref={circle1} size={320} fill="lightseagreen"></Circle>);
-return (yield* circle1().scale(2, 2).to(1, 2));
+(yield* circle1().scale(2, 2).to(1, 2));
+return anim_seq(circle().scale(2, 1), circle().opacity(0, 1), circle().scale(1, 1));
 
 };
 var default$ = makeScene2D(example_scene);

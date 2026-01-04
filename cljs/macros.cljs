@@ -251,6 +251,37 @@
        (~'js-yield* (~'m/waitFor ~stagger-delay)))
      (~'js-yield* (~'m/waitFor ~total-duration))))
 
+(defmacro anim-repeat
+  "Repeat animation N times and WAIT for completion (blocking).
+   Blocks further animations until all repetitions finish.
+   
+   Usage:
+   (anim-repeat 5
+     (anim (-> node (.scale 1.2 0.3) (.to 1 0.3))))
+   
+   ;; Next animation waits for all 5 repetitions"
+  [times & body]
+  `(anim
+    (~'m/loopFor ~times (fn []
+                          ~@body)))
+  ;; `(dotimes [_# ~times]
+  ;;    (anim ~@body))
+  )
+
+(defmacro anim-loop
+  "Loop animation infinitely in BACKGROUND (non-blocking).
+   Does NOT block - continues immediately to next animations.
+   
+   Usage:
+   (anim-loop
+     (anim (-> node (.scale 1.2 0.3) (.to 1 0.3))))
+   
+   ;; Next animation runs immediately while loop continues"
+  [& body]
+  `(~'js-yield
+    (~'m/loop (fn []
+                ~@body))))
+
 ;; --------------------
 ;; ---- DOM Macros ----
 ;; --------------------
@@ -297,18 +328,3 @@
   `(~'.findLast ~'view
                 (fn [~'node]
                   ~@predicate-body)))
-
-(defmacro find-ancestor
-  "Find the closest ancestor of this node that matches the given predicate.
-   Variable 'node' available in predicate.
-   
-   Usage:
-   (find-last (d/is Txt))
-   (find-last (instance? Txt node))
-   (let [texts (find-last (> (-> node (.scale.x)) 1))]
-     ...)
-   "
-  [& predicate-body]
-  `(~'.findAncestor ~'view
-                    (fn [~'node]
-                      ~@predicate-body)))

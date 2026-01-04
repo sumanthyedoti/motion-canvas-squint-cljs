@@ -51,8 +51,8 @@ return <Rect ref={m.makeRef(rects9, i)} width={100} height={100} x={(-250 + (125
 return m.all(rect.rotation(100, 1).to(-100, 1), rect.position.y(100, 1).to(-100, 2).to(0, 1));
 
 }))));
-(yield* squint_core.apply(m.all, rects9.map((function (node234) {
-const it10 = node234;
+(yield* squint_core.apply(m.all, rects9.map((function (node263) {
+const it10 = node263;
 return m.all(it10.rotation(100, 1).to(-100, 1), it10.position.y(100, 1).to(-100, 2).to(0, 1));
 
 }))));
