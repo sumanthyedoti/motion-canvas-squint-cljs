@@ -11,6 +11,7 @@ import node_hierarchy from "./scenes/docs/node_hierarchy?scene";
 import positioning from "./scenes/docs/positioning?scene";
 import nodes from "./scenes/docs/nodes?scene";
 import layout from "./scenes/docs/layout?scene";
+import signals from "./scenes/docs/signals?scene";
 
 export default makeProject({
   scenes: [
@@ -23,6 +24,7 @@ export default makeProject({
     // node_hierarchy,
     // positioning,
     // nodes,
-    layout,
+    // layout,
+    signals,
   ],
 });
